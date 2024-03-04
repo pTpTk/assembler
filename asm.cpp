@@ -1,7 +1,7 @@
 #include <fstream>
 #include <cassert>
 
-inline int Reg2Int(std::string reg) {
+inline uint Reg2Int(std::string reg) {
     if(reg == "%eax") return 0;
     if(reg == "%ecx") return 1;
     if(reg == "%edx") return 2;
@@ -42,6 +42,20 @@ void addl(std::ifstream& ifs) {
         assert(imm == (int8_t)imm);
 
         printf("0x83c%x%02x\n", Reg2Int(arg2), imm);
+
+    }
+    else {
+    // add src, dst
+        uint inst = 0x01'c0;
+        uint src = Reg2Int(arg1);
+        uint dst = Reg2Int(arg2);
+
+        printf("src = %d, dst = %d\n", src, dst);
+
+        inst |= (src << 3);
+        inst |= dst;
+
+        printf("0x%04x\n", inst);
 
     }
 }
