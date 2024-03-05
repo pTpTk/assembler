@@ -20,6 +20,14 @@ int main(int argc, char** argv) {
             addl(ifs);
             continue;
         }
+        if(token == "cdq") {
+            cdq(ifs);
+            continue;
+        }
+        if(token == "cmpl") {
+            cmpl(ifs);
+            continue;
+        }
 
         std::cout << token << std::endl;
     }

@@ -50,12 +50,31 @@ void addl(std::ifstream& ifs) {
         uint src = Reg2Int(arg1);
         uint dst = Reg2Int(arg2);
 
-        printf("src = %d, dst = %d\n", src, dst);
-
         inst |= (src << 3);
         inst |= dst;
 
         printf("0x%04x\n", inst);
 
     }
+}
+
+void cdq(std::ifstream& ifs) {
+    printf("0x99\n");
+}
+
+void cmpl(std::ifstream& ifs) {
+    std::string arg1, arg2;
+    ifs >> arg1 >> arg2;
+
+    // get rid of ','
+    arg1.resize(arg1.size()-1);
+
+    uint inst = 0x39'c0;
+    uint src = Reg2Int(arg1);
+    uint dst = Reg2Int(arg2);
+
+    inst |= (src << 3);
+    inst |= dst;
+
+    printf("0x%04x\n", inst);
 }
