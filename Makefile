@@ -4,3 +4,6 @@ all: $(wildcard *.cpp) $(wildcard *.h)
 
 test:
 	./assemble ../C-Interpreter/test/test.s
+
+debug:
+	g++ -DDEBUG -g main.cpp -o assemble
