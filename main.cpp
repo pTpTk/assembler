@@ -28,6 +28,18 @@ int main(int argc, char** argv) {
             cmpl(ifs);
             continue;
         }
+        if(token == "idivl") {
+            idivl(ifs);
+            continue;
+        }
+        if(token == "imul") {
+            imul(ifs);
+            continue;
+        }
+        if(token == "movl") {
+            movl(ifs);
+            continue;
+        }
 
         std::cout << token << std::endl;
     }
