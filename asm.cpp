@@ -1,11 +1,21 @@
 #include <fstream>
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 #ifdef DEBUG
     #define D(...) printf(__VA_ARGS__)
+
+    #define PRINT() { \
+    printf("0x"); \
+    for(auto i : inst) \
+        printf("%02x ", i); \
+    printf("\n"); \
+    }
+
 #else
     #define D(...)
+    #define PRINT()
 #endif
 
 namespace{
@@ -44,8 +54,13 @@ void push(std::ifstream& ifs) {
     std::string arg;
     ifs >> arg;
 
-    int reg = Reg2Int(arg);
-    D("0x%x\n", 0x50 + reg);
+    std::vector<uint8_t> inst{0x50};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[0] += reg;
+
+    PRINT();
 }
 
 // add imm, reg
@@ -56,33 +71,45 @@ void addl(std::ifstream& ifs) {
     std::string arg1, arg2;
     Get2Args(ifs, arg1, arg2);
 
+    std::vector<uint8_t> inst;
+
     if(arg1[0] == '$') {
     // add imm, reg
+
+        inst = {0x83, 0xc0, 0x00};
+
+        uint8_t reg = Reg2Int(arg2);
 
         int imm = Imm2Int(arg1);
         // temp hack for now
         assert(imm == (int8_t)imm);
 
-        D("0x83c%x%02x\n", Reg2Int(arg2), imm);
+        inst[1] |= reg;
+        inst[2] = imm;
+
+        PRINT();
 
     }
     else {
     // add src, dst
-        uint inst = 0x01'c0;
+        inst = {0x01, 0xc0};
+
         uint src = Reg2Int(arg1);
         uint dst = Reg2Int(arg2);
 
-        inst |= (src << 3);
-        inst |= dst;
+        inst[1] |= (src << 3);
+        inst[1] |= dst;
 
-        D("0x%04x\n", inst);
+        PRINT();
 
     }
 }
 
 // 0x99
 void cdq(std::ifstream& ifs) {
-    D("0x99\n");
+    std::vector<uint8_t> inst{0x99};
+
+    PRINT();
 }
 
 // 0x39 0b11<src><dst>
@@ -90,14 +117,15 @@ void cmpl(std::ifstream& ifs) {
     std::string arg1, arg2;
     Get2Args(ifs, arg1, arg2);
 
-    uint inst = 0x39'c0;
+    std::vector<uint8_t> inst{0x39, 0xc0};
+
     uint src = Reg2Int(arg1);
     uint dst = Reg2Int(arg2);
 
-    inst |= (src << 3);
-    inst |= dst;
+    inst[1] |= (src << 3);
+    inst[1] |= dst;
 
-    D("0x%04x\n", inst);
+    PRINT();
 }
 
 // 0xf7 0b11'111'<reg>
@@ -105,12 +133,13 @@ void idivl(std::ifstream& ifs) {
     std::string arg;
     ifs >> arg;
 
+    std::vector<uint8_t> inst{0xf7, 0xf8};
+
     int reg = Reg2Int(arg);
 
-    uint16_t inst = 0xf7'f8;
-    inst |= reg;
+    inst[1] |= reg;
 
-    D("0x%04x\n", inst);
+    PRINT();
 }
 
 // 0x0f'af 0b11'<dst>'<src>
@@ -118,14 +147,14 @@ void imul(std::ifstream& ifs) {
     std::string arg1, arg2;
     Get2Args(ifs, arg1, arg2);
     
-    uint inst = 0x0f'af'c0;
+    std::vector<uint8_t> inst{0x0f, 0xaf, 0xc0};
     uint src = Reg2Int(arg1);
     uint dst = Reg2Int(arg2);
 
-    inst |= src;
-    inst |= (dst << 3);
+    inst[2] |= src;
+    inst[2] |= (dst << 3);
 
-    D("0x%06x\n", inst);
+    PRINT();
 }
 
 //
@@ -133,32 +162,30 @@ void movl(std::ifstream& ifs) {
     std::string arg1, arg2;
     Get2Args(ifs, arg1, arg2);
 
+    std::vector<uint8_t> inst;
+
     // movl src, dst
     if(arg1[0] == '%' && arg2[0] == '%') {
-        uint inst = 0x89'c0;
+        inst = {0x89, 0xc0};
         uint src = Reg2Int(arg1);
         uint dst = Reg2Int(arg2);
 
-        inst |= (src << 3);
-        inst |= dst;
-
-        D("0x%04x\n", inst);
+        inst[1] |= (src << 3);
+        inst[1] |= dst;
     }
     // movl imm, reg
     // 0b1011'1<reg> imm
     else if(arg1[0] == '$') {
-        uint64_t inst = 0xb8'00000000;
+        inst = {0xb8, 0x00, 0x00, 0x00, 0x00};
         int imm = Imm2Int(arg1);
-        uint64_t reg = Reg2Int(arg2);
+        uint8_t reg = Reg2Int(arg2);
         char* p = (char*)&imm;
 
-        inst |= reg << 32;
-        inst |= p[0] << 24;
-        inst |= p[1] << 16;
-        inst |= p[2] << 8;
-        inst |= p[3];
-
-        D("%010lx\n", inst);
+        inst[0] |= reg;
+        inst[1] |= p[0];
+        inst[2] |= p[1];
+        inst[3] |= p[2];
+        inst[4] |= p[3];
     }
     // movl src, offset(dst)
     else if(arg1[0] == '%') {
@@ -167,15 +194,13 @@ void movl(std::ifstream& ifs) {
 
         arg2 = arg2.substr(arg2.size()-5, 4);
 
-        uint inst = 0x89'40'00;
+        inst = {0x89, 0x40, 0x00};
         uint src = Reg2Int(arg1);
         uint dst = Reg2Int(arg2);
 
-        inst |= (src << 11);
-        inst |= (dst << 8);
-        inst |= offset;
-
-        D("0x%06x\n", inst);
+        inst[1] |= (src << 3);
+        inst[1] |= dst;
+        inst[2] |= offset;
     }
     // movl offset(src), dst
     else if(arg2[0] == '%') {
@@ -184,16 +209,16 @@ void movl(std::ifstream& ifs) {
 
         arg1 = arg1.substr(arg1.size()-5, 4);
 
-        uint inst = 0x8b'40'00;
+        inst = {0x8b, 0x40, 0x00};
         uint src = Reg2Int(arg1);
         uint dst = Reg2Int(arg2);
 
-        inst |= (dst << 11);
-        inst |= (src << 8);
-        inst |= offset;
-
-        D("0x%06x\n", inst);
+        inst[1] |= (dst << 3);
+        inst[1] |= src;
+        inst[2] |= offset;
     }
     else
         assert(false);
+
+    PRINT();
 }
