@@ -49,20 +49,6 @@ inline void Get2Args(std::ifstream& ifs,
 
 } // namespace
 
-// 0x50 + reg
-void push(std::ifstream& ifs) {
-    std::string arg;
-    ifs >> arg;
-
-    std::vector<uint8_t> inst{0x50};
-
-    uint8_t reg = Reg2Int(arg);
-
-    inst[0] += reg;
-
-    PRINT();
-}
-
 // add imm, reg
 // 0x83 0b11'000'<reg> imm
 // add src, dst
@@ -219,6 +205,67 @@ void movl(std::ifstream& ifs) {
     }
     else
         assert(false);
+
+    PRINT();
+}
+
+void neg(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0xf7, 0xd8};
+
+    int reg = Reg2Int(arg);
+
+    inst[1] |= reg;
+
+    PRINT();
+}
+
+void _not(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0xf7, 0xd0};
+
+    int reg = Reg2Int(arg);
+
+    inst[1] |= reg;
+
+    PRINT();
+}
+
+// 0x58 + reg
+void pop(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x58};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[0] += reg;
+
+    PRINT();
+}
+
+// 0x50 + reg
+void push(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x50};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[0] += reg;
+
+    PRINT();
+}
+
+// 0xc3
+void ret(std::ifstream& ifs) {
+    std::vector<uint8_t> inst{0x99};
 
     PRINT();
 }

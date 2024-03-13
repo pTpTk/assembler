@@ -40,6 +40,22 @@ int main(int argc, char** argv) {
             movl(ifs);
             continue;
         }
+        if(token == "neg") {
+            neg(ifs);
+            continue;
+        }
+        if(token == "not") {
+            _not(ifs);
+            continue;
+        }
+        if(token == "pop") {
+            pop(ifs);
+            continue;
+        }
+        if(token == "ret") {
+            ret(ifs);
+            continue;
+        }
 
         std::cout << token << std::endl;
     }
