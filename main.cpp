@@ -56,6 +56,30 @@ int main(int argc, char** argv) {
             ret(ifs);
             continue;
         }
+        if(token == "sete") {
+            sete(ifs);
+            continue;
+        }
+        if(token == "setg") {
+            setg(ifs);
+            continue;
+        }
+        if(token == "setge") {
+            setge(ifs);
+            continue;
+        }
+        if(token == "setl") {
+            setl(ifs);
+            continue;
+        }
+        if(token == "setle") {
+            setle(ifs);
+            continue;
+        }
+        if(token == "setne") {
+            setne(ifs);
+            continue;
+        }
 
         std::cout << token << std::endl;
     }

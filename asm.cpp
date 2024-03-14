@@ -30,6 +30,11 @@ inline uint8_t Reg2Int(std::string reg) {
     if(reg == "%esi") return 6;
     if(reg == "%edi") return 7;
 
+    if(reg == "%al") return 0;
+    if(reg == "%cl") return 1;
+    if(reg == "%dl") return 2;
+    if(reg == "%bl") return 3;
+
     assert(false);
 }
 
@@ -265,7 +270,85 @@ void push(std::ifstream& ifs) {
 
 // 0xc3
 void ret(std::ifstream& ifs) {
-    std::vector<uint8_t> inst{0x99};
+    std::vector<uint8_t> inst{0xc3};
+
+    PRINT();
+}
+
+void sete(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x0f, 0x94, 0xc0};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[2] |= reg;
+
+    PRINT();
+}
+
+void setg(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x0f, 0x9f, 0xc0};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[2] |= reg;
+
+    PRINT();
+}
+
+void setge(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x0f, 0x9d, 0xc0};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[2] |= reg;
+
+    PRINT();
+}
+
+void setl(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x0f, 0x9c, 0xc0};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[2] |= reg;
+
+    PRINT();
+}
+
+void setle(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x0f, 0x9e, 0xc0};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[2] |= reg;
+
+    PRINT();
+}
+
+void setne(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x0f, 0x95, 0xc0};
+
+    uint8_t reg = Reg2Int(arg);
+
+    inst[2] |= reg;
 
     PRINT();
 }
