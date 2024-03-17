@@ -35,6 +35,18 @@ int main(int argc, char** argv) {
             imul(ifs2);
             continue;
         }
+        if(token == "je") {
+            je(ifs2);
+            continue;
+        }
+        if(token == "jmp") {
+            jmp(ifs2);
+            continue;
+        }
+        if(token == "jne") {
+            jne(ifs2);
+            continue;
+        }
         if(token == "movl") {
             movl(ifs2);
             continue;

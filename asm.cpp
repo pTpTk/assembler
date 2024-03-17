@@ -39,7 +39,14 @@ inline void Get2Args(std::ifstream& ifs,
     arg1.resize(arg1.size()-1);
 }
 
+inline void merge(std::vector<uint8_t>& v1, 
+                  std::vector<uint8_t>& v2) {
+    v1.insert(v1.end(), v2.begin(), v2.end());
+}
+
 } // namespace
+
+std::vector<uint8_t> insts;
 
 // add imm, reg
 // 0x83 0b11'000'<reg> imm
@@ -81,6 +88,8 @@ void addl(std::ifstream& ifs) {
         PRINT();
 
     }
+
+    merge(insts, inst);
 }
 
 // 0x99
@@ -88,6 +97,8 @@ void cdq(std::ifstream& ifs) {
     std::vector<uint8_t> inst{0x99};
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 // 0x39 0b11<src><dst>
@@ -104,6 +115,8 @@ void cmpl(std::ifstream& ifs) {
     inst[1] |= dst;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 // 0xf7 0b11'111'<reg>
@@ -118,6 +131,8 @@ void idivl(std::ifstream& ifs) {
     inst[1] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 // 0x0f'af 0b11'<dst>'<src>
@@ -133,6 +148,68 @@ void imul(std::ifstream& ifs) {
     inst[2] |= (dst << 3);
 
     PRINT();
+
+    merge(insts, inst);
+}
+
+void je(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x74, 0x00};
+
+    int tag = tagMap[arg];
+    int pos = insts.size() + 2;
+
+    int offset = tag - pos;
+
+    assert(offset == (int8_t)offset);
+
+    inst[1] |= (uint8_t)offset;
+
+    PRINT();
+
+    merge(insts, inst);
+}
+
+void jmp(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0xeb, 0x00};
+
+    int tag = tagMap[arg];
+    int pos = insts.size() + 2;
+
+    int offset = tag - pos;
+
+    assert(offset == (int8_t)offset);
+
+    inst[1] |= (uint8_t)offset;
+
+    PRINT();
+
+    merge(insts, inst);
+}
+
+void jne(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0x75, 0x00};
+
+    int tag = tagMap[arg];
+    int pos = insts.size() + 2;
+
+    int offset = tag - pos;
+
+    assert(offset == (int8_t)offset);
+
+    inst[1] |= (uint8_t)offset;
+
+    PRINT();
+
+    merge(insts, inst);
 }
 
 //
@@ -199,6 +276,8 @@ void movl(std::ifstream& ifs) {
         assert(false);
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void neg(std::ifstream& ifs) {
@@ -212,6 +291,8 @@ void neg(std::ifstream& ifs) {
     inst[1] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void _not(std::ifstream& ifs) {
@@ -225,6 +306,8 @@ void _not(std::ifstream& ifs) {
     inst[1] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 // 0x58 + reg
@@ -239,6 +322,8 @@ void pop(std::ifstream& ifs) {
     inst[0] += reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 // 0x50 + reg
@@ -253,6 +338,8 @@ void push(std::ifstream& ifs) {
     inst[0] += reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 // 0xc3
@@ -260,6 +347,8 @@ void ret(std::ifstream& ifs) {
     std::vector<uint8_t> inst{0xc3};
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void sete(std::ifstream& ifs) {
@@ -273,6 +362,8 @@ void sete(std::ifstream& ifs) {
     inst[2] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void setg(std::ifstream& ifs) {
@@ -286,6 +377,8 @@ void setg(std::ifstream& ifs) {
     inst[2] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void setge(std::ifstream& ifs) {
@@ -299,6 +392,8 @@ void setge(std::ifstream& ifs) {
     inst[2] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void setl(std::ifstream& ifs) {
@@ -312,6 +407,8 @@ void setl(std::ifstream& ifs) {
     inst[2] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void setle(std::ifstream& ifs) {
@@ -325,6 +422,8 @@ void setle(std::ifstream& ifs) {
     inst[2] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void setne(std::ifstream& ifs) {
@@ -338,6 +437,8 @@ void setne(std::ifstream& ifs) {
     inst[2] |= reg;
 
     PRINT();
+
+    merge(insts, inst);
 }
 
 void subl(std::ifstream& ifs) {
@@ -353,4 +454,6 @@ void subl(std::ifstream& ifs) {
     inst[1] |= dst;
 
     PRINT();
+
+    merge(insts, inst);
 }

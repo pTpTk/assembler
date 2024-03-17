@@ -28,7 +28,7 @@
     #define PRINT()
 #endif
 
-std::unordered_map<std::string, uint> tagMap;
+std::unordered_map<std::string, int> tagMap;
 
 inline void nextLine(std::ifstream& ifs) {
     ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -46,7 +46,9 @@ void collectTags(std::ifstream& ifs) {
         CHECK("cmpl"  , 2);
         CHECK("idivl" , 2);
         CHECK("imul"  , 3);
-        // TODO::je,jump,jne
+        CHECK("je"    , 2);
+        CHECK("jmp"   , 2);
+        CHECK("jne"   , 2);
         CHECK("neg"   , 2);
         CHECK("not"   , 2);
         CHECK("pop"   , 1);
