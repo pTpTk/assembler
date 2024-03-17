@@ -4,80 +4,88 @@
 #include <iostream>
 #include <sstream>
 
+#include "tag.cpp"
 #include "asm.cpp"
 
 int main(int argc, char** argv) {
     assert(argc == 2);
 
-    std::ifstream ifs(argv[1]);
+    std::ifstream ifs1(argv[1]);
+    std::ifstream ifs2(argv[1]);
     std::string token;
-    while(ifs >> token) {
-        if(token == "push") {
-            push(ifs);
-            continue;
-        }
+    collectTags(ifs1);
+
+    while(ifs2 >> token) {
         if(token == "addl") {
-            addl(ifs);
+            addl(ifs2);
             continue;
         }
         if(token == "cdq") {
-            cdq(ifs);
+            cdq(ifs2);
             continue;
         }
         if(token == "cmpl") {
-            cmpl(ifs);
+            cmpl(ifs2);
             continue;
         }
         if(token == "idivl") {
-            idivl(ifs);
+            idivl(ifs2);
             continue;
         }
         if(token == "imul") {
-            imul(ifs);
+            imul(ifs2);
             continue;
         }
         if(token == "movl") {
-            movl(ifs);
+            movl(ifs2);
             continue;
         }
         if(token == "neg") {
-            neg(ifs);
+            neg(ifs2);
             continue;
         }
         if(token == "not") {
-            _not(ifs);
+            _not(ifs2);
             continue;
         }
         if(token == "pop") {
-            pop(ifs);
+            pop(ifs2);
+            continue;
+        }
+        if(token == "push") {
+            push(ifs2);
             continue;
         }
         if(token == "ret") {
-            ret(ifs);
+            ret(ifs2);
             continue;
         }
         if(token == "sete") {
-            sete(ifs);
+            sete(ifs2);
             continue;
         }
         if(token == "setg") {
-            setg(ifs);
+            setg(ifs2);
             continue;
         }
         if(token == "setge") {
-            setge(ifs);
+            setge(ifs2);
             continue;
         }
         if(token == "setl") {
-            setl(ifs);
+            setl(ifs2);
             continue;
         }
         if(token == "setle") {
-            setle(ifs);
+            setle(ifs2);
             continue;
         }
         if(token == "setne") {
-            setne(ifs);
+            setne(ifs2);
+            continue;
+        }
+        if(token == "subl") {
+            subl(ifs2);
             continue;
         }
 

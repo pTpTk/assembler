@@ -352,3 +352,18 @@ void setne(std::ifstream& ifs) {
 
     PRINT();
 }
+
+void subl(std::ifstream& ifs) {
+    std::string arg1, arg2;
+    Get2Args(ifs, arg1, arg2);
+
+    std::vector<uint8_t> inst{0x29, 0xc0};
+
+    uint8_t src = Reg2Int(arg1);
+    uint8_t dst = Reg2Int(arg2);
+
+    inst[1] |= src << 3;
+    inst[1] |= dst;
+
+    PRINT();
+}
