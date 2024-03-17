@@ -46,7 +46,21 @@ void collectTags(std::ifstream& ifs) {
         CHECK("setne" , 3);
         CHECK("subl"  , 2);
 
-        // TODO::special handle for addl
+        if(token == "addl") {
+            std::string arg1;
+            ifs >> arg1;
+
+            if(arg1[0] == '$') {
+                pos += 3;
+                nextLine(ifs);
+                continue;
+            }
+            else {
+                pos += 2;
+                nextLine(ifs);
+                continue;
+            }
+        }
         // TODO::special handle for movl
 
         std::cout << token << std::endl;
