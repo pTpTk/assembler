@@ -12,6 +12,22 @@
         continue; \
     }
 
+
+#ifdef DEBUG
+    #define D(...) printf(__VA_ARGS__)
+
+    #define PRINT() { \
+    printf("0x"); \
+    for(auto i : inst) \
+        printf("%02x ", i); \
+    printf("\n"); \
+    }
+
+#else
+    #define D(...)
+    #define PRINT()
+#endif
+
 std::unordered_map<std::string, uint> tagMap;
 
 inline void nextLine(std::ifstream& ifs) {
@@ -24,7 +40,6 @@ void collectTags(std::ifstream& ifs) {
     uint pos = 0;
     while(ifs >> token) {
 
-        std::cout << token << std::hex << pos << std::endl;
         CHECK(".globl", 0);
         // TODO::call
         CHECK("cdq"   , 1);
@@ -61,9 +76,25 @@ void collectTags(std::ifstream& ifs) {
                 continue;
             }
         }
-        // TODO::special handle for movl
 
-        std::cout << token << std::endl;
+        if(token == "movl") {
+            std::string arg1, arg2;
+            ifs >> arg1 >> arg2;
+
+            if(arg1[0] == '%' && arg2[0] == '%') {
+                pos += 2;
+                continue;
+            }
+            else if(arg1[0] == '$') {
+                pos += 5;
+                continue;
+            }
+            else {
+                pos += 3;
+                continue;
+            }
+        }
+
         assert(token[token.size()-1] == ':');
 
         token.resize(token.size()-1);
@@ -72,7 +103,9 @@ void collectTags(std::ifstream& ifs) {
     }
 
     for(const auto& [key, val] : tagMap) {
-        printf("key: %s, val: 0x%x\n", key.c_str(), val);
+        D("tag: %s, val: 0x%x\n", key.c_str(), val);
     }
+
+    D("file length: 0x%x\n", pos);
 
 }

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "tag.cpp"
 #include "asm.cpp"
 
 int main(int argc, char** argv) {

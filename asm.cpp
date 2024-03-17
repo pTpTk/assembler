@@ -3,20 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#ifdef DEBUG
-    #define D(...) printf(__VA_ARGS__)
-
-    #define PRINT() { \
-    printf("0x"); \
-    for(auto i : inst) \
-        printf("%02x ", i); \
-    printf("\n"); \
-    }
-
-#else
-    #define D(...)
-    #define PRINT()
-#endif
+#include "tag.cpp"
 
 namespace{
 
