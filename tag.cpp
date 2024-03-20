@@ -17,6 +17,7 @@
     #define D(...) printf(__VA_ARGS__)
 
     #define PRINT() { \
+    printf("%2lx: ", insts.size()); \
     printf("0x"); \
     for(auto i : inst) \
         printf("%02x ", i); \
@@ -40,10 +41,11 @@ void collectTags(std::ifstream& ifs) {
     uint pos = 0;
     while(ifs >> token) {
 
+        D("%2x: %s\n", pos, token.c_str());
+
         CHECK(".globl", 0);
         // TODO::call
         CHECK("cdq"   , 1);
-        CHECK("cmpl"  , 2);
         CHECK("idivl" , 2);
         CHECK("imul"  , 3);
         CHECK("je"    , 2);
@@ -64,6 +66,22 @@ void collectTags(std::ifstream& ifs) {
         CHECK("subl"  , 2);
 
         if(token == "addl") {
+            std::string arg1;
+            ifs >> arg1;
+
+            if(arg1[0] == '$') {
+                pos += 3;
+                nextLine(ifs);
+                continue;
+            }
+            else {
+                pos += 2;
+                nextLine(ifs);
+                continue;
+            }
+        }
+
+        if(token == "cmpl") {
             std::string arg1;
             ifs >> arg1;
 

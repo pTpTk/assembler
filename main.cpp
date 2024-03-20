@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "asm.cpp"
+// #include "elf.hpp"
 
 int main(int argc, char** argv) {
     assert(argc == 2);
@@ -102,5 +103,10 @@ int main(int argc, char** argv) {
 
         std::cout << token << std::endl;
     }
+
+    for(auto c : shstrtab) {
+        printf("%c", c);
+    }
+    printf("\n");
 
 }

@@ -106,13 +106,34 @@ void cmpl(std::ifstream& ifs) {
     std::string arg1, arg2;
     Get2Args(ifs, arg1, arg2);
 
-    std::vector<uint8_t> inst{0x39, 0xc0};
+    std::vector<uint8_t> inst;
 
-    uint src = Reg2Int(arg1);
-    uint dst = Reg2Int(arg2);
+    if(arg1[0] == '$') {
+    // cmpl imm, reg
 
-    inst[1] |= (src << 3);
-    inst[1] |= dst;
+        inst = {0x83, 0xf8, 0x00};
+
+        uint8_t reg = Reg2Int(arg2);
+
+        int imm = Imm2Int(arg1);
+        // temp hack for now
+        assert(imm == (int8_t)imm);
+
+        inst[1] |= reg;
+        inst[2] = imm;
+
+        PRINT();
+
+    }
+    else {
+        inst = {0x39, 0xc0};
+
+        uint src = Reg2Int(arg1);
+        uint dst = Reg2Int(arg2);
+
+        inst[1] |= (src << 3);
+        inst[1] |= dst;
+    }
 
     PRINT();
 
