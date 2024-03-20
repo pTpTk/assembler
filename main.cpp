@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "asm.cpp"
-// #include "elf.hpp"
+#include "elf.hpp"
 
 int main(int argc, char** argv) {
     assert(argc == 2);
