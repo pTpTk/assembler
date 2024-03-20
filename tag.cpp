@@ -5,31 +5,7 @@
 #include <limits>
 #include <cassert>
 
-#define CHECK(TAG, SIZE) \
-    if(token == TAG) { \
-        pos += SIZE; \
-        nextLine(ifs); \
-        continue; \
-    }
-
-
-#ifdef DEBUG
-    #define D(...) printf(__VA_ARGS__)
-
-    #define PRINT() { \
-    printf("%2lx: ", insts.size()); \
-    printf("0x"); \
-    for(auto i : inst) \
-        printf("%02x ", i); \
-    printf("\n"); \
-    }
-
-#else
-    #define D(...)
-    #define PRINT()
-#endif
-
-std::unordered_map<std::string, int> tagMap;
+#include "misc.h"
 
 inline void nextLine(std::ifstream& ifs) {
     ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

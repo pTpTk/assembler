@@ -3,9 +3,9 @@
 #include <iostream>
 #include <vector>
 
-#include "tag.cpp"
+#include "misc.h"
 
-namespace{
+namespace {
 
 inline uint8_t Reg2Int(std::string reg) {
     if(reg == "%eax") return 0;
@@ -43,10 +43,6 @@ inline void merge(std::vector<uint8_t>& v1,
                   std::vector<uint8_t>& v2) {
     v1.insert(v1.end(), v2.begin(), v2.end());
 }
-
-} // namespace
-
-std::vector<uint8_t> insts;
 
 // add imm, reg
 // 0x83 0b11'000'<reg> imm
@@ -477,4 +473,99 @@ void subl(std::ifstream& ifs) {
     PRINT();
 
     merge(insts, inst);
+}
+
+} // namespace
+
+void assemble(std::ifstream& ifs) {
+    std::string token;
+
+    while(ifs >> token) {
+        if(token == "addl") {
+            addl(ifs);
+            continue;
+        }
+        if(token == "cdq") {
+            cdq(ifs);
+            continue;
+        }
+        if(token == "cmpl") {
+            cmpl(ifs);
+            continue;
+        }
+        if(token == "idivl") {
+            idivl(ifs);
+            continue;
+        }
+        if(token == "imul") {
+            imul(ifs);
+            continue;
+        }
+        if(token == "je") {
+            je(ifs);
+            continue;
+        }
+        if(token == "jmp") {
+            jmp(ifs);
+            continue;
+        }
+        if(token == "jne") {
+            jne(ifs);
+            continue;
+        }
+        if(token == "movl") {
+            movl(ifs);
+            continue;
+        }
+        if(token == "neg") {
+            neg(ifs);
+            continue;
+        }
+        if(token == "not") {
+            _not(ifs);
+            continue;
+        }
+        if(token == "pop") {
+            pop(ifs);
+            continue;
+        }
+        if(token == "push") {
+            push(ifs);
+            continue;
+        }
+        if(token == "ret") {
+            ret(ifs);
+            continue;
+        }
+        if(token == "sete") {
+            sete(ifs);
+            continue;
+        }
+        if(token == "setg") {
+            setg(ifs);
+            continue;
+        }
+        if(token == "setge") {
+            setge(ifs);
+            continue;
+        }
+        if(token == "setl") {
+            setl(ifs);
+            continue;
+        }
+        if(token == "setle") {
+            setle(ifs);
+            continue;
+        }
+        if(token == "setne") {
+            setne(ifs);
+            continue;
+        }
+        if(token == "subl") {
+            subl(ifs);
+            continue;
+        }
+
+        std::cout << token << std::endl;
+    }
 }
