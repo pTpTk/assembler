@@ -35,7 +35,10 @@ extern std::vector<uint8_t> insts;
 extern std::vector<uint8_t> file_header;
 extern std::vector<uint8_t> shstrtab;
 extern std::vector<uint8_t> index0_section_header;
+extern std::vector<uint8_t> shstrtab_section_header;
+extern std::vector<uint8_t> text_section_header;
 
 void collectTags(std::ifstream& ifs);
 void assemble(std::ifstream& ifs);
 void write(std::ofstream& ofs, const std::vector<uint8_t>& v);
+void writeInsts(std::ofstream& ofs);

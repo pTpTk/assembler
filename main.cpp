@@ -24,7 +24,9 @@ int main(int argc, char** argv) {
 
     write(ofs, file_header);
     write(ofs, shstrtab);
-    write(ofs, insts);
+    writeInsts(ofs);
     write(ofs, index0_section_header);
+    write(ofs, shstrtab_section_header);
+    write(ofs, text_section_header);
 
 }

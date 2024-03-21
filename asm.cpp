@@ -569,3 +569,12 @@ void assemble(std::ifstream& ifs) {
         std::cout << token << std::endl;
     }
 }
+
+void writeInsts(std::ofstream& ofs) {
+    uint size = insts.size();
+    ofs.write((const char *)insts.data(), size);
+
+    uint* uint_ptr;
+    uint_ptr = (uint*)text_section_header.data();
+    uint_ptr[5] = size;
+}
