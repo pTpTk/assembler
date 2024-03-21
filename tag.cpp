@@ -105,3 +105,20 @@ void collectTags(std::ifstream& ifs) {
     D("file length: 0x%x\n", pos);
 
 }
+
+void writeStrTab(std::ofstream& ofs) {
+    uint start = ofs.tellp();
+
+    for(const auto& [tag, val] : tagMap) {
+        ofs << '\0';
+        ofs << tag;
+    }
+    ofs << '\0';
+
+    uint end = ofs.tellp();
+
+    uint* uint_ptr;
+    uint_ptr = (uint*)strtab_section_header.data();
+    uint_ptr[4] = start;
+    uint_ptr[5] = end - start;
+}
