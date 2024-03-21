@@ -8,7 +8,6 @@
 
 #include "misc.h"
 
-std::unordered_map<std::string, int> tagMap;
 std::vector<uint8_t> insts;
 
 int main(int argc, char** argv) {
@@ -25,10 +24,14 @@ int main(int argc, char** argv) {
     write(ofs, file_header);
     write(ofs, shstrtab);
     writeInsts(ofs);
-    writeStrTab(ofs);
+    // writeStrTab(ofs);
+    // align(ofs, 4);
+    // writeSymTab(ofs);
+    align(ofs, 8);
     write(ofs, index0_section_header);
     write(ofs, shstrtab_section_header);
     write(ofs, text_section_header);
-    write(ofs, strtab_section_header);
+    // write(ofs, strtab_section_header);
+    // write(ofs, symtab_section_header);
 
 }

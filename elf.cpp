@@ -64,3 +64,11 @@ std::vector<uint8_t> shstrtab =
 void write(std::ofstream& ofs, const std::vector<uint8_t>& v) {
     ofs.write((const char *)v.data(), v.size());
 }
+
+void align(std::ofstream& ofs, int i) {
+    uint pos = ofs.tellp();
+    while(pos % i != 0) {
+        pos++;
+        ofs << '\0';
+    }
+}
