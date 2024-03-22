@@ -5,6 +5,7 @@
 #include <string>
 #include <limits>
 #include <cassert>
+#include <vector>
 
 #include "misc.h"
 

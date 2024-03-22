@@ -2,6 +2,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 #include "misc.h"
 
@@ -582,6 +583,6 @@ void assemble(std::ifstream& ifs) {
             continue;
         }
 
-        std::cout << token << std::endl;
+        D("%s\n", token.c_str());
     }
 }
