@@ -43,11 +43,11 @@ inline bool isGlobal(std::string str) {
 }
 
 void buildTabs() {
+    strTab += '\0';
+
     for(const auto& [tag, val] : tagMap) {
 
         D("tag: %s, val: 0x%x\n", tag.c_str(), val);
-
-        strTab += '\0';
 
         std::vector<uint8_t> symTabEntry = EMPTY_SYMTAB_EMTRY;
         uint pos = strTab.size();
@@ -59,6 +59,7 @@ void buildTabs() {
         merge(symTab, symTabEntry);
 
         strTab += tag;
+        strTab += '\0';
     }
 }
 
