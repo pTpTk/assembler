@@ -139,19 +139,6 @@ void collectTags(std::ifstream& ifs) {
 
 }
 
-void writeStrTab(std::ofstream& ofs) {
-    uint start = ofs.tellp();
-
-    ofs << strTab;
-
-    uint end = ofs.tellp();
-
-    uint* uint_ptr;
-    uint_ptr = (uint*)strtab_section_header.data();
-    uint_ptr[4] = start;
-    uint_ptr[5] = end - start;
-}
-
 void buildTabs() {
     for(const auto& [tag, val] : tagMap) {
 
@@ -170,18 +157,4 @@ void buildTabs() {
 
         strTab += tag;
     }
-}
-
-void writeSymTab(std::ofstream& ofs) {
-
-    uint start = ofs.tellp();
-
-    write(ofs, symTab);
-
-    uint end = ofs.tellp();
-
-    uint* uint_ptr;
-    uint_ptr = (uint*)symtab_section_header.data();
-    uint_ptr[4] = start;
-    uint_ptr[5] = end - start;
 }

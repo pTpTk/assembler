@@ -65,10 +65,40 @@ void write(std::ofstream& ofs, const std::vector<uint8_t>& v) {
     ofs.write((const char *)v.data(), v.size());
 }
 
+extern std::string strTab;
+extern std::vector<uint8_t> symTab;
+
 void align(std::ofstream& ofs, int i) {
     uint pos = ofs.tellp();
     while(pos % i != 0) {
         pos++;
         ofs << '\0';
     }
+}
+
+void writeStrTab(std::ofstream& ofs) {
+    uint start = ofs.tellp();
+
+    ofs << strTab;
+
+    uint end = ofs.tellp();
+
+    uint* uint_ptr;
+    uint_ptr = (uint*)strtab_section_header.data();
+    uint_ptr[4] = start;
+    uint_ptr[5] = end - start;
+}
+
+void writeSymTab(std::ofstream& ofs) {
+
+    uint start = ofs.tellp();
+
+    write(ofs, symTab);
+
+    uint end = ofs.tellp();
+
+    uint* uint_ptr;
+    uint_ptr = (uint*)symtab_section_header.data();
+    uint_ptr[4] = start;
+    uint_ptr[5] = end - start;
 }
