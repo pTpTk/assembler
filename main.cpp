@@ -8,7 +8,8 @@
 
 #include "misc.h"
 
-std::vector<uint8_t> insts;
+void collectTags(std::ifstream& ifs);
+void assemble(std::ifstream& ifs);
 
 int main(int argc, char** argv) {
     assert(argc == 3);
@@ -21,16 +22,16 @@ int main(int argc, char** argv) {
     collectTags(ifs1);
     assemble(ifs2);
 
-    write(ofs, file_header);
-    write(ofs, shstrtab);
-    writeInsts(ofs);
+    // write(ofs, file_header);
+    // write(ofs, shstrtab);
+    // writeInsts(ofs);
     // writeStrTab(ofs);
     // align(ofs, 4);
     // writeSymTab(ofs);
-    align(ofs, 8);
-    write(ofs, index0_section_header);
-    write(ofs, shstrtab_section_header);
-    write(ofs, text_section_header);
+    // align(ofs, 8);
+    // write(ofs, index0_section_header);
+    // write(ofs, shstrtab_section_header);
+    // write(ofs, text_section_header);
     // write(ofs, strtab_section_header);
     // write(ofs, symtab_section_header);
 

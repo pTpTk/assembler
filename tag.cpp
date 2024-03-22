@@ -14,10 +14,20 @@
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00 \
 }
 
+#define CHECK(TAG, SIZE) \
+    if(token == TAG) { \
+        pos += SIZE; \
+        nextLine(ifs); \
+        continue; \
+    }
+
 std::unordered_map<std::string, int> tagMap;
-std::unordered_set<std::string> globalTags;
 std::string strTab;
 std::vector<uint8_t> symTab(0x10, 0);
+
+namespace {
+
+std::unordered_set<std::string> globalTags;
 
 inline void nextLine(std::ifstream& ifs) {
     ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -28,11 +38,31 @@ inline void merge(std::vector<uint8_t>& v1,
     v1.insert(v1.end(), v2.begin(), v2.end());
 }
 
-inline bool contain(std::unordered_set<std::string> s, std::string str) {
-    return s.find(str) != s.end();
+inline bool isGlobal(std::string str) {
+    return globalTags.find(str) != globalTags.end();
 }
 
-void buildTabs();
+void buildTabs() {
+    for(const auto& [tag, val] : tagMap) {
+
+        D("tag: %s, val: 0x%x\n", tag.c_str(), val);
+
+        strTab += '\0';
+
+        std::vector<uint8_t> symTabEntry = EMPTY_SYMTAB_EMTRY;
+        uint pos = strTab.size();
+        uint* uint_ptr = (uint*)symTabEntry.data();
+        uint_ptr[0] = pos;
+        uint_ptr[1] = val;
+        if (isGlobal(tag)) symTabEntry[0x0C] = 0x10;
+
+        merge(symTab, symTabEntry);
+
+        strTab += tag;
+    }
+}
+
+} // namespace
 
 void collectTags(std::ifstream& ifs) {
     std::string token;
@@ -129,32 +159,8 @@ void collectTags(std::ifstream& ifs) {
 
     }
 
-    for(const auto& [key, val] : tagMap) {
-        D("tag: %s, val: 0x%x\n", key.c_str(), val);
-    }
-
     buildTabs();
 
     D("file length: 0x%x\n", pos);
 
-}
-
-void buildTabs() {
-    for(const auto& [tag, val] : tagMap) {
-
-        D("tag: %s, val: 0x%x\n", key.c_str(), val);
-
-        strTab += '\0';
-
-        std::vector<uint8_t> symTabEntry = EMPTY_SYMTAB_EMTRY;
-        uint pos = strTab.size();
-        uint* uint_ptr = (uint*)symTabEntry.data();
-        uint_ptr[0] = pos;
-        uint_ptr[1] = val;
-        if (contain(globalTags, tag)) symTabEntry[0x0C] = 0x10;
-
-        merge(symTab, symTabEntry);
-
-        strTab += tag;
-    }
 }

@@ -5,6 +5,22 @@
 
 #include "misc.h"
 
+#ifdef DEBUG
+    #define PRINT() { \
+    printf("%2lx: ", insts.size()); \
+    printf("0x"); \
+    for(auto i : inst) \
+        printf("%02x ", i); \
+    printf("\n"); \
+    }
+#else
+    #define PRINT()
+#endif
+
+std::vector<uint8_t> insts;
+extern std::unordered_map<std::string, int> tagMap;
+extern std::vector<uint8_t> text_section_header;
+
 namespace {
 
 inline uint8_t Reg2Int(std::string reg) {
@@ -568,13 +584,4 @@ void assemble(std::ifstream& ifs) {
 
         std::cout << token << std::endl;
     }
-}
-
-void writeInsts(std::ofstream& ofs) {
-    uint size = insts.size();
-    ofs.write((const char *)insts.data(), size);
-
-    uint* uint_ptr;
-    uint_ptr = (uint*)text_section_header.data();
-    uint_ptr[5] = size;
 }
