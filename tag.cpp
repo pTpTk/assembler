@@ -24,10 +24,11 @@
 
 std::unordered_map<std::string, int> tagMap;
 std::string strTab;
-std::vector<uint8_t> symTab(0x10, 0);
+std::vector<uint8_t> symTabLocal(0x10, 0);
+std::vector<uint8_t> symTabGlobal;
 
 namespace {
-
+    
 std::unordered_set<std::string> globalTags;
 
 inline void nextLine(std::ifstream& ifs) {
@@ -55,13 +56,22 @@ void buildTabs() {
         uint* uint_ptr = (uint*)symTabEntry.data();
         uint_ptr[0] = pos;
         uint_ptr[1] = val;
-        if (isGlobal(tag)) symTabEntry[0x0C] = 0x10;
 
-        merge(symTab, symTabEntry);
+        if (isGlobal(tag)) {
+            symTabEntry[0x0C] = 0x10;
+            merge(symTabGlobal, symTabEntry);
+        }
+        else {
+            merge(symTabLocal, symTabEntry);
+        }
 
         strTab += tag;
         strTab += '\0';
     }
+
+    D("local sym table has %lu entries, "
+      "global sym table has %lu entries\n",
+      symTabLocal.size() >> 4, symTabGlobal.size() >> 4);
 }
 
 } // namespace

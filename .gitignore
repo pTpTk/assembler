@@ -1,3 +1,4 @@
 assemble
 .vscode
 output.o
+output.x

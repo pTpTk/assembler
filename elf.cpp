@@ -7,7 +7,9 @@
 
 extern std::vector<uint8_t> insts;
 extern std::string strTab;
-extern std::vector<uint8_t> symTab;
+extern std::vector<uint8_t> symTabLocal;
+extern std::vector<uint8_t> symTabGlobal;
+
 
 namespace {
 
@@ -102,13 +104,14 @@ void setShOff() {
     offset += strTab.size();
     align4(offset);
 
-    offset += symTab.size();
+    offset += symTabLocal.size();
+    offset += symTabGlobal.size();
     align8(offset);
 
     D("file_header: 0x%lx, shstrtab: 0x%lx, insts: 0x%lx, "
-      "strtab: 0x%lx, symtab: 0x%lx, shoff: 0x%x\n", 
+      "strtab: 0x%lx, symtabL: 0x%lx, symtabG: 0x%lx, shoff: 0x%x\n", 
       file_header.size(), shstrtab.size(), insts.size(),
-      strTab.size(), symTab.size(), offset);
+      strTab.size(), symTabLocal.size(), symTabGlobal.size(), offset);
 
     uint* uint_ptr = (uint*)file_header.data();
     uint_ptr[8] = offset;
@@ -166,7 +169,8 @@ void writeSymTab(std::ofstream& ofs) {
 
     uint start = ofs.tellp();
 
-    write(ofs, symTab);
+    write(ofs, symTabLocal);
+    write(ofs, symTabGlobal);
 
     uint end = ofs.tellp();
 
@@ -174,7 +178,7 @@ void writeSymTab(std::ofstream& ofs) {
     uint_ptr = (uint*)symtab_section_header.data();
     uint_ptr[4] = start;
     uint_ptr[5] = end - start;
-    uint_ptr[7] = symTab.size() >> 4;
+    uint_ptr[7] = symTabLocal.size() >> 4;
 
     align(ofs, 8);
 }
