@@ -84,10 +84,11 @@ void collectTags(std::ifstream& ifs) {
 
         D("%2x: %s\n", pos, token.c_str());
 
-        // TODO::call
+        CHECK("call"  , 5);
         CHECK("cdq"   , 1);
         CHECK("idivl" , 2);
         CHECK("imul"  , 3);
+        CHECK("int"   , 2);
         CHECK("je"    , 2);
         CHECK("jmp"   , 2);
         CHECK("jne"   , 2);

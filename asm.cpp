@@ -105,6 +105,27 @@ void addl(std::ifstream& ifs) {
     merge(insts, inst);
 }
 
+void call(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0xe8, 0x00, 0x00, 0x00, 0x00};
+
+    int tag = tagMap[arg];
+    int pos = insts.size() + 5;
+
+    int offset = tag - pos;
+    char* p = (char*)&offset;
+    inst[1] |= p[0];
+    inst[2] |= p[1];
+    inst[3] |= p[2];
+    inst[4] |= p[3];
+
+    PRINT();
+
+    merge(insts, inst);
+}
+
 // 0x99
 void cdq(std::ifstream& ifs) {
     std::vector<uint8_t> inst{0x99};
@@ -180,6 +201,23 @@ void imul(std::ifstream& ifs) {
 
     inst[2] |= src;
     inst[2] |= (dst << 3);
+
+    PRINT();
+
+    merge(insts, inst);
+}
+
+void _int(std::ifstream& ifs) {
+    std::string arg;
+    ifs >> arg;
+
+    std::vector<uint8_t> inst{0xcd, 0x00};
+
+    assert(arg[0] == '$');
+    arg = arg.substr(1, arg.size()-1);
+    uint imm = stoi(arg, nullptr, 16);
+
+    inst[1] = (uint8_t)imm;
 
     PRINT();
 
@@ -502,6 +540,10 @@ void assemble(std::ifstream& ifs) {
             addl(ifs);
             continue;
         }
+        if(token == "call") {
+            call(ifs);
+            continue;
+        }
         if(token == "cdq") {
             cdq(ifs);
             continue;
@@ -516,6 +558,10 @@ void assemble(std::ifstream& ifs) {
         }
         if(token == "imul") {
             imul(ifs);
+            continue;
+        }
+        if(token == "int") {
+            _int(ifs);
             continue;
         }
         if(token == "je") {
