@@ -26,10 +26,21 @@ std::unordered_map<std::string, int> tagMap;
 std::string strTab;
 std::vector<uint8_t> symTabLocal(0x10, 0);
 std::vector<uint8_t> symTabGlobal;
+std::vector<uint8_t> relText;
 
 namespace {
-    
+
+struct RelEntry {
+    std::string name;
+    uint offset;
+
+    RelEntry(std::string n, uint o) : name(n), offset(o) {}
+};
+
 std::unordered_set<std::string> globalTags;
+std::unordered_set<std::string> calledTags;
+std::unordered_map<std::string, int> tagIndexes;
+std::vector<RelEntry> rels;
 
 inline void nextLine(std::ifstream& ifs) {
     ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -46,6 +57,7 @@ inline bool isGlobal(std::string str) {
 
 void buildTabs() {
     strTab += '\0';
+    int index = 1;
 
     for(const auto& [tag, val] : tagMap) {
 
@@ -65,6 +77,27 @@ void buildTabs() {
             merge(symTabLocal, symTabEntry);
         }
 
+        calledTags.erase(tag);
+
+        tagIndexes[tag] = index;
+        ++index;
+
+        strTab += tag;
+        strTab += '\0';
+    }
+
+    for(auto& tag : calledTags) {
+        std::vector<uint8_t> symTabEntry = EMPTY_SYMTAB_EMTRY;
+        uint pos = strTab.size();
+        uint* uint_ptr = (uint*)symTabEntry.data();
+        uint_ptr[0] = pos;
+        symTabEntry[0x0C] = 0x10;
+        symTabEntry[0x0E] = 0x00;
+        merge(symTabGlobal, symTabEntry);
+
+        tagIndexes[tag] = index;
+        ++index;
+
         strTab += tag;
         strTab += '\0';
     }
@@ -72,6 +105,23 @@ void buildTabs() {
     D("local sym table has %lu entries, "
       "global sym table has %lu entries\n",
       symTabLocal.size() >> 4, symTabGlobal.size() >> 4);
+
+    D("relocation record:\n");
+    
+    for(auto& rel : rels) {
+        std::vector<uint8_t> relEntry(8,0);
+        uint32_t& r_offset = (uint&)relEntry[0];
+        uint8_t&  r_type   =        relEntry[4];
+        uint8_t&  r_sym    =        relEntry[5];
+        r_offset = rel.offset;
+        r_type   = 0x02;
+        r_sym    = tagIndexes[rel.name];
+
+        merge(relText, relEntry);
+
+        D("%s: %x, tagID: %d\n", rel.name.c_str(), 
+            rel.offset, tagIndexes[rel.name]);
+    }
 }
 
 } // namespace
@@ -84,7 +134,6 @@ void collectTags(std::ifstream& ifs) {
 
         D("%2x: %s\n", pos, token.c_str());
 
-        CHECK("call"  , 5);
         CHECK("cdq"   , 1);
         CHECK("idivl" , 2);
         CHECK("imul"  , 3);
@@ -154,6 +203,17 @@ void collectTags(std::ifstream& ifs) {
                 pos += 3;
                 continue;
             }
+        }
+
+        if(token == "call") {
+            std::string tag;
+            ifs >> tag;
+            calledTags.insert(tag);
+
+            rels.emplace_back(tag, pos+1);
+
+            pos += 5;
+            continue;
         }
 
         if(token == ".globl") {
