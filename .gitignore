@@ -1,4 +1,4 @@
 assemble
 .vscode
-output.o
+*.o
 output.x
