@@ -29,10 +29,11 @@ inline uint8_t Reg2Int(std::string reg) {
     if(reg == "%ecx") return 1;
     if(reg == "%edx") return 2;
     if(reg == "%ebx") return 3;
-    if(reg == "%esp") return 4;
-    if(reg == "%ebp") return 5;
     if(reg == "%esi") return 6;
     if(reg == "%edi") return 7;
+
+    if(reg == "%rsp") return 4;
+    if(reg == "%rbp") return 5;
 
     if(reg == "%al") return 0;
     if(reg == "%cl") return 1;
@@ -101,6 +102,26 @@ void addl(std::ifstream& ifs) {
         PRINT();
 
     }
+
+    merge(insts, inst);
+}
+
+void addq(std::ifstream& ifs) {
+    std::string arg1, arg2;
+    Get2Args(ifs, arg1, arg2);
+
+    std::vector<uint8_t> inst{0x48, 0x83, 0xc0, 0x00};
+
+    uint8_t reg = Reg2Int(arg2);
+
+    int imm = Imm2Int(arg1);
+    // temp hack for now
+    assert(imm == (int8_t)imm);
+
+    inst[1] |= reg;
+    inst[2] = imm;
+
+    PRINT();
 
     merge(insts, inst);
 }
@@ -342,6 +363,25 @@ void movl(std::ifstream& ifs) {
     merge(insts, inst);
 }
 
+void movq(std::ifstream& ifs) {
+    std::string arg1, arg2;
+    Get2Args(ifs, arg1, arg2);
+
+    std::vector<uint8_t> inst;
+
+    // movl src, dst
+    inst = {0x48, 0x89, 0xc0};
+    uint src = Reg2Int(arg1);
+    uint dst = Reg2Int(arg2);
+
+    inst[1] |= (src << 3);
+    inst[1] |= dst;
+
+    PRINT();
+
+    merge(insts, inst);
+}
+
 void neg(std::ifstream& ifs) {
     std::string arg;
     ifs >> arg;
@@ -530,6 +570,10 @@ void assemble(std::ifstream& ifs) {
             addl(ifs);
             continue;
         }
+        if(token == "addq") {
+            addq(ifs);
+            continue;
+        }
         if(token == "call") {
             call(ifs);
             continue;
@@ -568,6 +612,10 @@ void assemble(std::ifstream& ifs) {
         }
         if(token == "movl") {
             movl(ifs);
+            continue;
+        }
+        if(token == "movq") {
+            movq(ifs);
             continue;
         }
         if(token == "neg") {

@@ -63,6 +63,7 @@ void readInput(std::ifstream& ifs) {
 
         D("%2x: %s\n", pos, token.c_str());
 
+        CHECK("addq"  , 4);
         CHECK("cdq"   , 1);
         CHECK("idivl" , 2);
         CHECK("imul"  , 3);
@@ -70,6 +71,7 @@ void readInput(std::ifstream& ifs) {
         CHECK("je"    , 2);
         CHECK("jmp"   , 2);
         CHECK("jne"   , 2);
+        CHECK("movq"  , 3);
         CHECK("neg"   , 2);
         CHECK("not"   , 2);
         CHECK("pop"   , 1);
