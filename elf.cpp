@@ -25,7 +25,7 @@ std::vector<uint8_t> file_header =
     0x00, 0x00, 0x40, 0x00, 0x06, 0x00, 0x01, 0x00
 };
 
-std::string shstrtab("\0.symtab\0.strtab\0.shstrtab\0.rel.text\0", 38);
+std::string shstrtab("\0.symtab\0.strtab\0.shstrtab\0.rela.text\0", 39);
 
 class Section_Header
 {
@@ -51,53 +51,6 @@ Section_Header strtab_section_header;
 Section_Header symtab_section_header;
 Section_Header rel_text_section_header;
 
-// std::vector<uint8_t> index0_section_header(0x28, 0);
-
-// std::vector<uint8_t> shstrtab_section_header = 
-// {
-//     0x11, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-//     0x34, 0x00, 0x00, 0x00, 0x25, 0x00, 0x00, 0x00, 
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-//     0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-// };
-
-// std::vector<uint8_t> text_section_header = 
-// {
-//     0x1F, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-//     0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x5C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-// };
-
-// std::vector<uint8_t> strtab_section_header = 
-// {
-//     0x09, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-// };
-
-// std::vector<uint8_t> symtab_section_header = 
-// {
-//     0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x04, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00
-// };
-
-// std::vector<uint8_t> rel_text_section_header = 
-// {
-//     0x1B, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
-//     0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-//     0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-//     0x04, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00
-// };
-
 inline void write(std::ofstream& ofs, const std::vector<uint8_t>& v) {
     ofs.write((const char *)v.data(), v.size());
 }
@@ -106,28 +59,12 @@ inline void write(std::ofstream& ofs, Section_Header& v) {
     ofs.write(v.data(), v.header.size());
 }
 
-inline void align4(uint& offset) {
-    if(offset & 0b11) {
-        offset >>= 2;
-        ++offset;
-        offset <<= 2;
-    }
-}
-
-inline void align8(uint& offset) {
-    if(offset & 0b111) {
-        offset >>= 3;
-        ++offset;
-        offset <<= 3;
-    }
-}
-
 void align(std::ofstream& ofs, int i) {
     uint pos = ofs.tellp();
     while(pos % i != 0) {
         pos++;
-        ofs << '\0';
     }
+    ofs.seekp(pos);
 }
 
 void writeFileHeader(std::ofstream& ofs) {
@@ -142,8 +79,11 @@ void writeShStrTab(std::ofstream& ofs) {
 
     uint64_t end = ofs.tellp();
 
-    shstrtab_section_header.sh_offset = 0x40;
-    shstrtab_section_header.sh_size = end - 0x40;
+    shstrtab_section_header.sh_name      = 0x11;
+    shstrtab_section_header.sh_type      = 0x03;
+    shstrtab_section_header.sh_offset    = 0x40;
+    shstrtab_section_header.sh_size      = end - 0x40;
+    shstrtab_section_header.sh_addralign = 0x01;
 
     align(ofs, 4);
 }
@@ -155,8 +95,12 @@ void writeText(std::ofstream& ofs) {
 
     uint end = ofs.tellp();
 
-    text_section_header.sh_offset = start;
-    text_section_header.sh_size = end - start;
+    text_section_header.sh_name      = 0x20;
+    text_section_header.sh_type      = 0x01;
+    text_section_header.sh_flags     = 0x06;
+    text_section_header.sh_offset    = start;
+    text_section_header.sh_size      = end - start;
+    text_section_header.sh_addralign = 0x01;
 
     align(ofs, 4);
 }
@@ -168,8 +112,11 @@ void writeStrTab(std::ofstream& ofs) {
 
     uint end = ofs.tellp();
 
-    strtab_section_header.sh_offset = start;
-    strtab_section_header.sh_size = end - start;
+    strtab_section_header.sh_name      = 0x11;
+    strtab_section_header.sh_type      = 0x03;
+    strtab_section_header.sh_offset    = start;
+    strtab_section_header.sh_size      = end - start;
+    strtab_section_header.sh_addralign = 0x01;
 
     align(ofs, 4);
 }
@@ -183,14 +130,14 @@ void writeSymTab(std::ofstream& ofs) {
 
     uint end = ofs.tellp();
 
-    symtab_section_header.sh_offset = start;
-    symtab_section_header.sh_size = end - start;
-
-    // uint* uint_ptr;
-    // uint_ptr = (uint*)symtab_section_header.data();
-    // uint_ptr[4] = start;
-    // uint_ptr[5] = end - start;
-    // uint_ptr[7] = symTabLocal.size() >> 4;
+    symtab_section_header.sh_name      = 0x01;
+    symtab_section_header.sh_type      = 0x02;
+    symtab_section_header.sh_offset    = start;
+    symtab_section_header.sh_size      = end - start;
+    symtab_section_header.sh_link      = 0x03;
+    symtab_section_header.sh_info      = symTabLocal.size() >> 4;
+    symtab_section_header.sh_addralign = 0x08;
+    symtab_section_header.sh_entsize   = 0x18;
 
     align(ofs, 4);
 }
@@ -205,6 +152,16 @@ void writeRelText(std::ofstream& ofs) {
     rel_text_section_header.sh_offset = start;
     rel_text_section_header.sh_size = end - start;
 
+    rel_text_section_header.sh_name      = 0x1B;
+    rel_text_section_header.sh_type      = 0x04;
+    rel_text_section_header.sh_flags     = 0x40;
+    rel_text_section_header.sh_offset    = start;
+    rel_text_section_header.sh_size      = end - start;
+    rel_text_section_header.sh_link      = 0x04;
+    rel_text_section_header.sh_info      = 0x02;
+    rel_text_section_header.sh_addralign = 0x08;
+    rel_text_section_header.sh_entsize   = 0x18;
+
     align(ofs, 8);
 }
 
@@ -212,18 +169,17 @@ void writeShHeaders(std::ofstream& ofs) {
     uint64_t& e_shoff = (uint64_t&)file_header[0x28];
     e_shoff = ofs.tellp();
 
-    // write(ofs, index0_section_header);
+    write(ofs, index0_section_header);
     write(ofs, shstrtab_section_header);
-    // write(ofs, text_section_header);
+    write(ofs, text_section_header);
     write(ofs, strtab_section_header);
-    // write(ofs, symtab_section_header);
-    // write(ofs, rel_text_section_header);
+    write(ofs, symtab_section_header);
+    write(ofs, rel_text_section_header);
 }
 
 } // namespace
 
 void writeElf(std::ofstream& ofs) {
-    // setShOff();
     writeShStrTab(ofs);
     writeText(ofs);
     writeStrTab(ofs);
