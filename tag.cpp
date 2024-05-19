@@ -11,8 +11,9 @@
 
 #define EMPTY_SYMTAB_EMTRY \
 { \
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, \
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00 \
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
 }
 
 #define CHECK(TAG, SIZE) \
@@ -24,7 +25,7 @@
 
 std::unordered_map<std::string, int> tagMap;
 std::string strTab;
-std::vector<uint8_t> symTabLocal(0x10, 0);
+std::vector<uint8_t> symTabLocal(0x18, 0);
 std::vector<uint8_t> symTabGlobal;
 std::vector<uint8_t> relText;
 
@@ -176,13 +177,13 @@ void buildTabs() {
         D("tag: %s, val: 0x%x\n", tag.c_str(), val);
 
         std::vector<uint8_t> symTabEntry = EMPTY_SYMTAB_EMTRY;
-        uint pos = strTab.size();
-        uint* uint_ptr = (uint*)symTabEntry.data();
-        uint_ptr[0] = pos;
-        uint_ptr[1] = val;
+        uint32_t& st_name  = (uint32_t&)symTabEntry[0x00];
+        uint64_t& st_value = (uint64_t&)symTabEntry[0x08];
+        st_name  = strTab.size();
+        st_value = val;
 
         if (isGlobal(tag)) {
-            symTabEntry[0x0C] = 0x10;
+            symTabEntry[4] = 0x10;
             merge(symTabGlobal, symTabEntry);
         }
         else {
@@ -203,8 +204,8 @@ void buildTabs() {
         uint pos = strTab.size();
         uint* uint_ptr = (uint*)symTabEntry.data();
         uint_ptr[0] = pos;
-        symTabEntry[0x0C] = 0x10;
-        symTabEntry[0x0E] = 0x00;
+        symTabEntry[4] = 0x10;
+        symTabEntry[6] = 0x00;
         merge(symTabGlobal, symTabEntry);
 
         tagIndexes[tag] = index;
