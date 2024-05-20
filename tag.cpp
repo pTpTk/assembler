@@ -64,28 +64,28 @@ void readInput(std::ifstream& ifs) {
 
         D("%2x: %s\n", pos, token.c_str());
 
-        CHECK("addq"  , 4);
-        CHECK("cdq"   , 1);
-        CHECK("idivl" , 2);
-        CHECK("imul"  , 3);
-        CHECK("int"   , 2);
-        CHECK("je"    , 2);
-        CHECK("jmp"   , 2);
-        CHECK("jne"   , 2);
-        CHECK("movq"  , 3);
-        CHECK("neg"   , 2);
-        CHECK("not"   , 2);
-        CHECK("pop"   , 1);
-        CHECK("push"  , 1);
-        CHECK("ret"   , 1);
-        CHECK("sete"  , 3);
-        CHECK("setg"  , 3);
-        CHECK("setg"  , 3);
-        CHECK("setge" , 3);
-        CHECK("setl"  , 3);
-        CHECK("setle" , 3);
-        CHECK("setne" , 3);
-        CHECK("subl"  , 2);
+        CHECK("addq"    , 4);
+        CHECK("cdq"     , 1);
+        CHECK("idivl"   , 2);
+        CHECK("imul"    , 3);
+        CHECK("je"      , 2);
+        CHECK("jmp"     , 2);
+        CHECK("jne"     , 2);
+        CHECK("movq"    , 3);
+        CHECK("neg"     , 2);
+        CHECK("not"     , 2);
+        CHECK("pop"     , 1);
+        CHECK("push"    , 1);
+        CHECK("ret"     , 1);
+        CHECK("sete"    , 3);
+        CHECK("setg"    , 3);
+        CHECK("setg"    , 3);
+        CHECK("setge"   , 3);
+        CHECK("setl"    , 3);
+        CHECK("setle"   , 3);
+        CHECK("setne"   , 3);
+        CHECK("subl"    , 2);
+        CHECK("syscall" , 2);
 
         if(token == "addl") {
             std::string arg1;

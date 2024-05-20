@@ -564,6 +564,14 @@ void subl(std::ifstream& ifs) {
     merge(insts, inst);
 }
 
+void syscall(std::ifstream& ifs) {
+    std::vector<uint8_t> inst{0x0f, 0x05};
+
+    PRINT();
+
+    merge(insts, inst);
+}
+
 } // namespace
 
 void assemble(std::ifstream& ifs) {
@@ -596,10 +604,6 @@ void assemble(std::ifstream& ifs) {
         }
         if(token == "imul") {
             imul(ifs);
-            continue;
-        }
-        if(token == "int") {
-            _int(ifs);
             continue;
         }
         if(token == "je") {
@@ -668,6 +672,10 @@ void assemble(std::ifstream& ifs) {
         }
         if(token == "subl") {
             subl(ifs);
+            continue;
+        }
+        if(token == "syscall") {
+            syscall(ifs);
             continue;
         }
 
