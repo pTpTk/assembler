@@ -132,7 +132,7 @@ void readInput(std::ifstream& ifs) {
                 continue;
             }
             else {
-                pos += 3;
+                pos += 4;
                 continue;
             }
         }

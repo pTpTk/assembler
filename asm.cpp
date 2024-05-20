@@ -32,8 +32,14 @@ inline uint8_t Reg2Int(std::string reg) {
     if(reg == "%esi") return 6;
     if(reg == "%edi") return 7;
 
+    if(reg == "%rax") return 0;
+    if(reg == "%rcx") return 1;
+    if(reg == "%rdx") return 2;
+    if(reg == "%rbx") return 3;
     if(reg == "%rsp") return 4;
     if(reg == "%rbp") return 5;
+    if(reg == "%rsi") return 6;
+    if(reg == "%rdi") return 7;
 
     if(reg == "%al") return 0;
     if(reg == "%cl") return 1;
@@ -118,8 +124,8 @@ void addq(std::ifstream& ifs) {
     // temp hack for now
     assert(imm == (int8_t)imm);
 
-    inst[1] |= reg;
-    inst[2] = imm;
+    inst[2] |= reg;
+    inst[3] = imm;
 
     PRINT();
 
@@ -166,8 +172,6 @@ void cmpl(std::ifstream& ifs) {
 
         inst[1] |= reg;
         inst[2] = imm;
-
-        PRINT();
 
     }
     else {
@@ -332,13 +336,13 @@ void movl(std::ifstream& ifs) {
 
         arg2 = arg2.substr(arg2.size()-5, 4);
 
-        inst = {0x89, 0x40, 0x00};
+        inst = {0x67, 0x89, 0x40, 0x00};
         uint src = Reg2Int(arg1);
         uint dst = Reg2Int(arg2);
 
-        inst[1] |= (src << 3);
-        inst[1] |= dst;
-        inst[2] |= offset;
+        inst[2] |= (src << 3);
+        inst[2] |= dst;
+        inst[3] |= offset;
     }
     // movl offset(src), dst
     else if(arg2[0] == '%') {
@@ -347,13 +351,13 @@ void movl(std::ifstream& ifs) {
 
         arg1 = arg1.substr(arg1.size()-5, 4);
 
-        inst = {0x8b, 0x40, 0x00};
+        inst = {0x67, 0x8b, 0x40, 0x00};
         uint src = Reg2Int(arg1);
         uint dst = Reg2Int(arg2);
 
-        inst[1] |= (dst << 3);
-        inst[1] |= src;
-        inst[2] |= offset;
+        inst[2] |= (dst << 3);
+        inst[2] |= src;
+        inst[3] |= offset;
     }
     else
         assert(false);
@@ -374,8 +378,8 @@ void movq(std::ifstream& ifs) {
     uint src = Reg2Int(arg1);
     uint dst = Reg2Int(arg2);
 
-    inst[1] |= (src << 3);
-    inst[1] |= dst;
+    inst[2] |= (src << 3);
+    inst[2] |= dst;
 
     PRINT();
 
