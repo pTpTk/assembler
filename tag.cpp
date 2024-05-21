@@ -86,6 +86,7 @@ void readInput(std::ifstream& ifs) {
         CHECK("setne"   , 3);
         CHECK("subl"    , 2);
         CHECK("syscall" , 2);
+        CHECK("xor"     , 3);
 
         if(token == "addl") {
             std::string arg1;

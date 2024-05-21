@@ -572,6 +572,23 @@ void syscall(std::ifstream& ifs) {
     merge(insts, inst);
 }
 
+void _xor(std::ifstream& ifs) {
+    std::string arg1, arg2;
+    Get2Args(ifs, arg1, arg2);
+
+    std::vector<uint8_t> inst{0x48, 0x31, 0xc0};
+
+    uint8_t src = Reg2Int(arg1);
+    uint8_t dst = Reg2Int(arg2);
+
+    inst[2] |= src << 3;
+    inst[2] |= dst;
+
+    PRINT();
+
+    merge(insts, inst);
+}
+
 } // namespace
 
 void assemble(std::ifstream& ifs) {
@@ -676,6 +693,10 @@ void assemble(std::ifstream& ifs) {
         }
         if(token == "syscall") {
             syscall(ifs);
+            continue;
+        }
+        if(token == "xor") {
+            _xor(ifs);
             continue;
         }
 
