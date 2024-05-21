@@ -136,7 +136,7 @@ void call(std::ifstream& ifs) {
     std::string arg;
     ifs >> arg;
 
-    std::vector<uint8_t> inst{0xe8, 0xfc, 0xff, 0xff, 0xff};
+    std::vector<uint8_t> inst{0xe8, 0x00, 0x00, 0x00, 0x00};
 
     PRINT();
 

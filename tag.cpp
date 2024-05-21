@@ -225,13 +225,15 @@ void buildRel() {
     D("relocation record:\n");
     
     for(auto& rel : rels) {
-        std::vector<uint8_t> relEntry(8,0);
-        uint32_t& r_offset = (uint&)relEntry[0];
-        uint8_t&  r_type   =        relEntry[4];
-        uint8_t&  r_sym    =        relEntry[5];
+        std::vector<uint8_t> relEntry(0x18,0);
+        uint64_t& r_offset = (uint64_t&)relEntry[0];
+        uint32_t& r_type   = (uint32_t&)relEntry[8];
+        uint32_t& r_sym    = (uint32_t&)relEntry[12];
+        uint64_t& r_addend = (uint64_t&)relEntry[16];
         r_offset = rel.offset;
-        r_type   = 0x02;
+        r_type   = 0x04;
         r_sym    = tagIndexes[rel.name];
+        r_addend = -4;
 
         merge(relText, relEntry);
 
