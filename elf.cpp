@@ -112,7 +112,7 @@ void writeStrTab(std::ofstream& ofs) {
 
     uint end = ofs.tellp();
 
-    strtab_section_header.sh_name      = 0x11;
+    strtab_section_header.sh_name      = 0x09;
     strtab_section_header.sh_type      = 0x03;
     strtab_section_header.sh_offset    = start;
     strtab_section_header.sh_size      = end - start;
